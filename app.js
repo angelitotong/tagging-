@@ -1,48 +1,52 @@
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function(event) { 
+
     text = document.getElementById('output')
     op = document.getElementById('option')
-    
-    user = prompt('>>> ')
+    input = document.getElementById('input')
+    user = prompt('>>>')
 
     function clear(){
         op.remove()
     }
 
     function names(alt){
-        userInput = prompt('NAMES >>> ')
-        inputSplit = userInput.split(',')
-        run = 0
+        names = prompt('Names>>>')
         tagged = []
-        for (let index = 0; index < inputSplit.length; index++) {
-            nameList = inputSplit[index].trim().split(',')
-            author = nameList[0].toString().split(' ')
-            space = author.length;
-            nameTags = ''
-            if (space == 3){
-                nameTags = `<name><surname>${author[0]} ${author[1]}</surname> <given-names>${author[2]}</given-names></name>`
-            } else if (space == 2){
-                nameTags = `<name><surname>${author[0]}</surname> <given-names>${author[1]}</given-names></name>`
-            }
-            tagged.push(nameTags)
-            out = tagged.toString()
-            output = out.replaceAll(',','')
-            run++
-            etal = ''
-            if (run == inputSplit.length){
-                if (alt){
-                    if (run >= 6){
-                        etal ='<etal/>'
-                    }
-                    text.append(`<person-group person-group-type="author">${output}${etal}</person-group>\n`)
-                }else{
-                    if (run >= 6){
-                        etal ='<etal/>'
-                    }
-                    text.append(`${output}${etal}\n`)
-                }
-                
-            }
+        list = ''
+        nameList = names.split(',')
+        etal = ''
+        if(nameList.length >= 6){
+            etal = '<etal/>'
         }
+        for (let i = 0; i < nameList.length; i++){
+            surname = []
+            givennames = []
+            author = nameList[i].trim().split(' ')
+            for (let x = 0; x < author.length; x++){
+                if(author[x].length > 1){
+                    if (author[x][0] == author[x][0].toLowerCase() && author[x][1] == author[x][1].toLowerCase() && author[x][1] != '.'){
+                        surname.push(author[x])
+                    } else if (author[x][0] == author[x][0].toUpperCase() && author[x][1] == author[x][1].toLowerCase() && author[x][1] != '.'){
+                        surname.push(author[x])
+                    } else if (author[x][0] == author[x][0].toUpperCase() && author[x][1] == author[x][1].toLowerCase() && author[x][1] == '.'){
+                        givennames.push(author[x])
+                    } else if (author[x][0] == author[x][0].toUpperCase() && author[x][1] == author[x][1].toUpperCase()){
+                        givennames.push(author[x])
+                    }
+                } else if (author[x].length == 1 && author[x][0] == author[x][0].toUpperCase()){
+                    givennames.push(author[x])
+                }
+            }
+            tagging(surname,givennames)
+            clear()
+        }
+
+        function tagging(surname,givennames){
+            surname = surname.toString()
+            givennames = givennames.toString()
+            tagged.push(`<name><surname>${surname.replace(',',' ')}</surname> <given-names>${givennames.replace(',',' ')}</given-names></name>`)
+        }
+        text.append(`${tagged.toString().replaceAll(',', '')}${etal}`)
         clear()
     }
 
@@ -66,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
     function Page(){
         userInput = prompt('Fpage and Last Page(0), Page range(1), Elocation-id(2)>>> ')
-        input = prompt('>>>')
+        input = prompt('Page #>>>')
         input = input.split('-')
         x = input[0]
         y = input[1]
@@ -82,19 +86,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
         clear()
     }
 
+    function titleCase(){
+        userInput = prompt('Article title>>>')
+        text.append(userInput.toTitleCase())
+
+    }
+
 
     if (user == 0){
-        alt = false
-        names(alt)
+        names()
     } else if(user == 1){
-        alt = true
-        names(alt)
-    } else if(user == 2){
         DOI()
-    } else if(user == 3){
+    } else if(user == 2){
         URI()
-    } else if(user == 4){
+    } else if(user == 3){
         Page()
+    } else if(user == 4){
+        titleCase()
     }
 
 });
